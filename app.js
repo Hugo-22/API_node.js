@@ -42,7 +42,6 @@ mysql.createConnection({
                 res.json(checkAndChange(deleteMember))
             })
             
-
         MembersRouter.route('/')
 
             // Récupère tous les membres

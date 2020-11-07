@@ -21,4 +21,4 @@ exports.checkAndChange = (obj) => {
         return this.error(obj.message)
     else
         return this.success(obj)
-}
+} 
