@@ -6,7 +6,7 @@
         "port": "8889",
         "database": "nodejs",
         "user": "root",
-        "password": "*"
+        "password": "root"
     }, 
     "errors": {
         "wrongID": "wrong id",

@@ -3,7 +3,7 @@ let db, config
 module.exports = (_db, _config) => {
     db = _db
     config = _config
-    return Members 
+    return Members
 }
 
 let Members = class {
@@ -16,7 +16,7 @@ let Members = class {
                 .then((result) => {
                     if (result[0] != undefined)
                         next(result[0])
-                    else 
+                    else
                         next(new Error(config.errors.wrongID))
                 })
                 .catch((err) => next(err))
@@ -28,7 +28,7 @@ let Members = class {
         return new Promise((next) => {
 
             if (max != undefined && max > 0) {
-    
+
                 db.query('SELECT * FROM members LIMIT 0, ?', [parseInt(max)])
                     .then((result) => next(result))
                     .catch((err) => next(err))
@@ -36,8 +36,8 @@ let Members = class {
                 next(new Error(config.errors.wrongMaxValue))
             } else {
                 db.query('SELECT * FROM members')
-                .then((result) => next(result))
-                .catch((err) => next(err))  
+                    .then((result) => next(result))
+                    .catch((err) => next(err))
             }
         })
     }
@@ -66,7 +66,7 @@ let Members = class {
                         next(result)
                     })
                     .catch((err) => next(err))
-            }  else {
+            } else {
                 next(new Error(config.errors.noNameValue))
             }
         })
@@ -76,7 +76,7 @@ let Members = class {
 
         return new Promise((next) => {
 
-            if (name && name.trim() != '') { 
+            if (name && name.trim() != '') {
 
                 name = name.trim()
 

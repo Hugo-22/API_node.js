@@ -2,8 +2,10 @@ const express = require('express')
 const { checkAndChange } = require('./assets/functions')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')('dev')
-const config = require('./assets/config.json')
 const mysql = require('promise-mysql')
+const config = require('./assets/config.json')
+const swaggerUi = require('swagger-ui-express')
+const swaggerDocument = require('./assets/swagger.json')
 
 mysql.createConnection({
     host: config.db.host,
@@ -14,50 +16,53 @@ mysql.createConnection({
 }).then((db) => {
     console.log('connected');
 
-        const app = express()
-        let MembersRouter = express.Router()
-        let Members = require('./assets/class/Members')(db, config)
+    const app = express()
 
-        app.use(morgan)
-        app.use(bodyParser.json()); 
-        app.use(bodyParser.urlencoded({ extended: true }));
 
-        MembersRouter.route('/:id')
+    let MembersRouter = express.Router()
+    let Members = require('./assets/class/Members')(db, config)
 
-            // Récupère un membre en fonction de son :id
-            .get(async (req, res) => {
-                let member = await Members.getByID(req.params.id)
-                res.json(checkAndChange(member))
-            })
+    app.use(morgan)
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({ extended: true }))
+    app.use(config.rootAPI + 'api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-            // Modifie un membre en fonction de son :id
-            .put(async (req, res) => {
-                let updateMember = await Members.update(req.params.id, req.body.name)
-                res.json(checkAndChange(updateMember))
-            })
+    MembersRouter.route('/:id')
 
-            // Supprime un membre avec ID
-            .delete(async (req, res) => {
-                let deleteMember = await Members.delete(req.params.id)
-                res.json(checkAndChange(deleteMember))
-            })
-            
-        MembersRouter.route('/')
+        // Récupère un membre en fonction de son :id
+        .get(async (req, res) => {
+            let member = await Members.getByID(req.params.id)
+            res.json(checkAndChange(member))
+        })
 
-            // Récupère tous les membres
-            .get(async (req, res) => {
-                let allMembers = await Members.getAll(req.query.max)
-                res.json(checkAndChange(allMembers))
-            })
+        // Modifie un membre en fonction de son :id
+        .put(async (req, res) => {
+            let updateMember = await Members.update(req.params.id, req.body.name)
+            res.json(checkAndChange(updateMember))
+        })
 
-            // Ajoute un membre
-            .post(async (req, res) => {
-                let addMember = await Members.add(req.body.name)
-                res.json(checkAndChange(addMember))
-            })
+        // Supprime un membre avec ID
+        .delete(async (req, res) => {
+            let deleteMember = await Members.delete(req.params.id)
+            res.json(checkAndChange(deleteMember))
+        })
 
-        app.use(config.rootAPI + 'members', MembersRouter)
-        app.listen(config.port, () => console.log('Server is running on port ' + config.port))
+    MembersRouter.route('/')
+
+        // Récupère tous les membres
+        .get(async (req, res) => {
+            let allMembers = await Members.getAll(req.query.max)
+            res.json(checkAndChange(allMembers))
+        })
+
+        // Ajoute un membre
+        .post(async (req, res) => {
+            let addMember = await Members.add(req.body.name)
+            res.json(checkAndChange(addMember))
+        })
+
+    app.use(config.rootAPI + 'members', MembersRouter)
+    app.listen(config.port, () => console.log('Server is running on port ' + config.port))
 
 }).catch((err) => {
     console.log(err.message);
